@@ -1,6 +1,13 @@
 const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 const config = require('../config'); // get our config file
 
+/**
+ * Checks the incoming token and determines its owner, sets the variable.
+ * @param req
+ * @param res
+ * @param next
+ * @returns status and error message, if an error occurred.
+ */
 function verifyToken(req, res, next) {
 
   // check header or url parameters or post parameters for token

@@ -7,7 +7,10 @@ const usersController = require('./UserController');
 const PostController = require('./PostController');
 
 
-
+/**
+ * Connect all controllers
+ * @param app this our Express application
+ */
 module.exports = (app) => {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());

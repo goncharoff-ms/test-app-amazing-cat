@@ -5,9 +5,8 @@ const verifyToken = require('../auth/verifyToken');
 const VerifyUsername = require('../auth/verifyUsername');
 const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 const bcrypt = require('bcryptjs');
-const config = require('./../config'); // get config file
-const User = require('./../models/User');
-
+const config = require('../config'); // get config file
+const User = require('../models/User');
 
 
 router.post('/login', function(req, res) {
@@ -19,7 +18,6 @@ router.post('/login', function(req, res) {
     if (!user) {
       return res.status(404).send({ code : 404, message: 'No user found.'});
     }
-
 
     const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
     if (!passwordIsValid) {

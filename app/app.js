@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const morgan = require('morgan');
 const dbUrl = require('./config').dbUrl;
-const controllers = require('./controllers');
+const controllers = require('./controllers/index');
 
 mongoose.connect(dbUrl, { useMongoClient: true });
 

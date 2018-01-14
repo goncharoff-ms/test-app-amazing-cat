@@ -1,5 +1,12 @@
-const User = require('./../models/User');
+const User = require('../models/User');
 
+/**
+ * Check the uniqueness of username
+ * @param req
+ * @param res
+ * @param next
+ * @return status and error message, if an error occurs
+ */
 function verifyUsername(req, res, next) {
 
   User.find({ username: req.body.username }, (err, userDouble) => {

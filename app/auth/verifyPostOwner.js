@@ -1,6 +1,13 @@
-const User = require('./../models/User');
-const Post = require('./../models/Post');
+const User = require('../models/User');
+const Post = require('../models/Post');
 
+/**
+ * Checks if this post belongs to the user who made the request
+ * @param req
+ * @param res
+ * @param next
+ * @return status and error message, if an error occurs
+ */
 function verifyPostOwner(req, res, next) {
 
   Post.findById(req.params.id, (err, post) => {
