@@ -1,4 +1,4 @@
-node_modules/
+node_modules
 app.log
-.idea/
-.circleci/
+.idea
+.circleci
