@@ -9,6 +9,10 @@ npm run dev
 ```
 npm run start
 ```
+Сгенерировать jsdocs (папка out/): 
+```
+npm run docs
+```
 Postman API documentation:
 https://documenter.getpostman.com/view/2448626/api/7TFEuKd
 
