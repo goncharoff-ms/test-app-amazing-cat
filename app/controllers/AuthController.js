@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-
 const verifyToken = require('../auth/verifyToken');
-const VerifyUsername = require('../auth/verifyUsername');
-const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
+const verifyUserData = require('../auth/verifyUserData');
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const config = require('../config'); // get config file
+const config = require('../config');
 const User = require('../models/User');
 
 
@@ -37,7 +36,7 @@ router.get('/logout', function(req, res) {
   res.status(200).send({ auth: false, token: null });
 });
 
-router.post('/register', VerifyUsername, function(req, res) {
+router.post('/register', verifyUserData, function(req, res) {
 
   const hashedPassword = bcrypt.hashSync(req.body.password, 8);
 

@@ -9,7 +9,7 @@ npm run dev
 ```
 npm run start
 ```
-Сгенерировать jsdocs (папка out/): 
+Сгенерировать js docs (папка out/): 
 ```
 npm run docs
 ```
