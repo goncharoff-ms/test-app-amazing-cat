@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Post = require('../models/Post');
 
+
 /**
  * Checks if this post belongs to the user who made the request
  * @param req
@@ -14,13 +15,16 @@ function verifyPostOwner(req, res, next) {
     if (err) {
       return res.status(500).send({
         code: 500,
-        message: "There was a problem update posts"
+        message: 'There was a problem verify token'
       });
     }
 
     User.findById(req.userId, (err, user) => {
       if (err) {
-        return res.status(500).end();
+        res.status(500).send({
+          code: 500,
+          message: 'There was a problem verify token'
+        });
       }
       if(user.username === post.author) {
         req.post = post;
@@ -31,14 +35,7 @@ function verifyPostOwner(req, res, next) {
           message: 'not a valid login or token'
         });
       }
-
-
     });
-
-
-
-
-
   });
 
 

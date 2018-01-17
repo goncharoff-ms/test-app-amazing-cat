@@ -2,6 +2,8 @@ const cluster = require('express-cluster');
 const port = process.env.PORT || 3000;
 const app = require('./app/app');
 
+cluster((worker) => {
+
   const gracefulShutdown = () => {
     console.log("Received kill signal, shutting down gracefully.");
     server.close(function() {
@@ -23,13 +25,18 @@ const app = require('./app/app');
   });
 
 
+  return server;
+}, {verbose : true});
+
+
+
+
 
 /*
+
  const cluster = require('express-cluster');
  const port = process.env.PORT || 3000;
  const app = require('./app/app');
-
- cluster((worker) => {
 
  const gracefulShutdown = () => {
  console.log("Received kill signal, shutting down gracefully.");
@@ -50,14 +57,6 @@ const app = require('./app/app');
  const server = app.listen(port, function() {
  console.log('Express server listening on port ' + port);
  });
-
-
- return server;
- }, {
- verbose : true,
- });
-
-
 
  */
 
