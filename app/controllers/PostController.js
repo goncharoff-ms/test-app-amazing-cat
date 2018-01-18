@@ -13,10 +13,10 @@ const logger = require('log4js').getLogger('app');
 router.get('/:id', (req, res) => {
   Post.findById(req.params.id, (err, post) => {
     if (err) {
-      logger.error('Post get by Id error', {err, params: req.params});
-      return res.status(500).send({
-        code: 500,
-        message : "There was a problem read posts"
+      logger.warn('Post in not available', req.params, err);
+       res.status(404).send({
+        code: 404,
+        message : 'This post is not available.',
       });
     }
 
@@ -30,8 +30,7 @@ router.get('/:id', (req, res) => {
       logger.warn('Post in not available', req.params);
       res.status(404).send({
         code: 404,
-        message: 'This post is not available.',
-        post
+        message: 'This post is not available.'
       });
     }
 
@@ -80,7 +79,7 @@ router.post('/', verifyToken, (req, res) => {
   User.findById(req.userId, (err, user) => {
     if (err) {
       logger.error('Post create new, find owner', {err, params: req.params});
-       res.status(500).send({
+      res.status(500).send({
         code: 500,
         message : "There was a problem create new post."
       });
