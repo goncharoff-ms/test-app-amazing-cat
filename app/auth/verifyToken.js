@@ -21,13 +21,15 @@ function verifyToken(req, res, next) {
       return res.status(500).send({ code: 500, auth: false, message: 'Failed to authenticate token.' });
     }
 
-    req.redis.exists(token, (err, reply) => {
+    console.log('decoded:', decoded);
+
+    req.redis.exists(decoded.jti, (err, reply) => {
       if(reply === 1) {
         return res.status(401).send({ code: 401, auth: false, message: 'Token is not valid.' });
       } else {
         let timeAliveToken = Math.round(decoded.exp - (Date.now() / 1000));
         if(timeAliveToken > 0) {
-          req.token.hash = token;
+          req.token.jti = decoded.jti;
           req.token.timeToDelete = timeAliveToken;
           req.userId = decoded.id;
           next();

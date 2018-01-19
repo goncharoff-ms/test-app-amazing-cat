@@ -28,7 +28,7 @@ cluster((worker) => {
 
 
   return server;
-}, {verbose : true});
+}, {verbose : true, count: 1});
 
 
 

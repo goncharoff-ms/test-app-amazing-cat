@@ -52,9 +52,6 @@ client.on('error',  () => {
 });
 
 
-
-
-
 const accessLogStream = fs.createWriteStream('app.log', {flags: 'a'});
 
 app.use(redisExpress(client));
