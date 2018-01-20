@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 const PostSchema = new mongoose.Schema({
-  title: String,
-  content: String,
-  author: String,
-  creationDate: Date,
-  lastEditDate: Date
+  title: {type: String, required: true},
+  content: {type: String, required: true },
+  author: {type: String, required: true},
+  creationDate: {type: Date, required: false, default: Date.now()},
+  lastEditDate: {type: Date, required: false, default: null}
 });
 mongoose.model('Post', PostSchema);
 
