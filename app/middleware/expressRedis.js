@@ -1,6 +1,4 @@
-module.exports = (client) => {
-  return function redis (req, res, next) {
-    req.redis = client;
-    next();
-  }
+module.exports = client => (req, res, next) => {
+  req.redis = client;
+  next();
 };

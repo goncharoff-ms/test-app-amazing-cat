@@ -1,4 +1,4 @@
-const User = require('../models/User');
+/* eslint-disable no-underscore-dangle */
 const Post = require('../models/Post');
 
 
@@ -10,35 +10,24 @@ const Post = require('../models/Post');
  * @return status and error message, if an error occurs
  */
 function verifyPostOwner(req, res, next) {
-
-  Post.findById(req.params.id, (err, post) => {
-    if (err) {
-      return res.status(500).send({
-        code: 500,
-        message: 'There was a problem verify token'
-      });
-    }
-
-    User.findById(req.userId, (err, user) => {
-      if (err) {
-        res.status(500).send({
-          code: 500,
-          message: 'There was a problem verify token'
-        });
-      }
-      if(user.username === post.author) {
+  Post.findById(req.params.id)
+    .populate('author')
+    .exec()
+    .then((post) => {
+      if (String(post.author._id) === String(req.userId)) {
         req.post = post;
         next();
       } else {
         res.status(403).send({
           code: 403,
-          message: 'not a valid login or token'
+          message: 'not a valid login or token',
         });
       }
-    });
-  });
-
-
+    })
+    .catch(() => res.status(500).send({
+      code: 500,
+      message: 'There was a problem verify token [post]',
+    }));
 }
 
 module.exports = verifyPostOwner;

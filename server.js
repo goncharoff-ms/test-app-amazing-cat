@@ -1,34 +1,31 @@
 const cluster = require('express-cluster');
 
+const logger = require('./app/logger');
 
-cluster((worker) => {
+const app = require('./app/app');
 
+cluster(() => {
   const port = process.env.PORT || 3000;
-  const app = require('./app/app');
+  const server = app.listen(port, () => {
+    logger.info(`Express server listening on port ${port}`);
+  });
 
   const gracefulShutdown = () => {
-    console.log("Received kill signal, shutting down gracefully.");
-    server.close(function() {
-      console.log("Closed out remaining connections.");
-      process.exit()
+    logger.error('Received kill signal, shutting down gracefully.');
+    server.close(() => {
+      logger.error('Closed out remaining connections.');
+      process.exit();
     });
 
-    setTimeout(function() {
-      console.error("Could not close connections in time, forcefully shutting down");
-      process.exit()
+    setTimeout(() => {
+      logger.error('Could not close connections in time, forcefully shutting down');
+      process.exit();
     }, 10000);
   };
 
-  process.on ('SIGTERM', gracefulShutdown);
-  process.on ('SIGINT', gracefulShutdown);
-
-  const server = app.listen(port, function() {
-    console.log('Express server listening on port ' + port);
-  });
-
+  process.on('SIGTERM', gracefulShutdown);
+  process.on('SIGINT', gracefulShutdown);
 
   return server;
-}, {verbose : true, count: 1});
-
-
+}, { verbose: true });
 

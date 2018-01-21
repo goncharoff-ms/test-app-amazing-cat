@@ -13,18 +13,24 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "bluebird": "^3.5.1",
     "body-parser": "^1.16.1",
     "cluster": "^0.7.7",
     "express": "^4.14.1",
     "express-cluster": "0.0.5",
     "jsonwebtoken": "^7.4.1",
-    "log4js": "^2.4.1",
+    "mag": "^0.9.1",
     "mongoose": "^4.8.5",
     "morgan": "^1.9.0",
     "redis": "^2.8.0",
     "shortid": "^2.2.8"
   },
   "devDependencies": {
+    "eslint": "^4.16.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.5.1",
     "jsdoc": "^3.5.5",
     "nodemon": "^1.14.11"
   }
