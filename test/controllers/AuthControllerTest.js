@@ -31,7 +31,7 @@ function getNewUser(username = 'username', password = 'password') {
 }
 
 
-describe('Auth', () => {
+describe('AuthController', () => {
   beforeEach((done) => {
     User.remove({}, () => {
       done();

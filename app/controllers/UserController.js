@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const express = require('express');
 
 const router = express.Router();
@@ -32,12 +33,13 @@ router.delete('/:username', verifyToken, (req, res) => {
     }))
     .catch((error) => {
       logger.error(`Delete user: ${req.params.username} - error find by id and remove`, error);
-      return res.status(500).send({ code: 500, message: 'There was a problem deleting the user.'});
+      return res.status(500).send({ code: 500, message: 'There was a problem deleting the user.' });
     });
 });
 
 router.get('/:username/posts', (req, res) => {
-  Post.find({ author: req.params.username }, '_id')
+  User.findOne({ username: req.params.username })
+    .then(user => Post.find({ author: user._id }, '_id'))
     .then((posts) => {
       if (posts.length > 0) {
         res.status(200).send({
@@ -52,8 +54,8 @@ router.get('/:username/posts', (req, res) => {
         });
       }
     })
-    .catch((error) => {
-      logger.error(`Posts user: ${req.params.username} - error user posts find`, error);
+    .catch(() => {
+      logger.error(`Posts user: ${req.params.username} - error user posts find`);
       return res.status(500).send({
         code: 500,
         message: 'There was a problem read posts',
