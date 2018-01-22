@@ -9,6 +9,10 @@ npm run dev
 ```
 npm run start
 ```
+Запуск тестов:
+```
+npm run test
+```
 Сгенерировать js docs (папка out/): 
 ```
 npm run docs
