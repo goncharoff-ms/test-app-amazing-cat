@@ -23,56 +23,61 @@ let client = redis.createClient();
 const logger = require('./logger');
 
 
-function tryReconnectMongo() {
-  logger.error('There is no connection with Mongo, we are trying to connect');
-  const timerId = setInterval(() => {
+module.exports = (mode = 'dev') => {
+  function tryReconnectMongo() {
+    logger.error('There is no connection with Mongo, we are trying to connect');
+    const timerId = setInterval(() => {
+      mongoose.connect(config.dbUrl, { useMongoClient: true });
+    }, 2000);
+
+    setTimeout(() => {
+      clearInterval(timerId);
+      logger.error('I could not connect to the database, I turned off');
+      client.quit();
+      process.exit();
+    }, 10000);
+  }
+
+  if (mode === 'test') {
+    mongoose.connect(config.dbUtlTest, { useMongoClient: true });
+  } else {
     mongoose.connect(config.dbUrl, { useMongoClient: true });
-  }, 2000);
+  }
 
-  setTimeout(() => {
-    clearInterval(timerId);
-    logger.error('I could not connect to the database, I turned off');
-    client.quit();
-    process.exit();
-  }, 10000);
-}
+  mongoose.Promise = bluebird;
 
+  mongoose.connection.on('error', tryReconnectMongo);
 
-mongoose.connect(config.dbUrl, { useMongoClient: true });
+  mongoose.connection.on('disconnected', tryReconnectMongo);
 
-mongoose.Promise = bluebird;
+  mongoose.connection.on('connected', () => {
+    logger.info('Connection with Mongo is installed');
+  });
 
-mongoose.connection.on('error', tryReconnectMongo);
+  client.on('connect', () => {
+    logger.info('Connection with Redis is installed');
+  });
 
-mongoose.connection.on('disconnected', tryReconnectMongo);
+  client.on('error', () => {
+    logger.error('Connection error with redis');
+    const timerId = setInterval(() => {
+      client = redis.createClient();
+    }, 2000);
 
-mongoose.connection.on('connected', () => {
-  logger.info('Connection with Mongo is installed');
-});
+    setTimeout(() => {
+      clearInterval(timerId);
+      logger.error('I could not connect to the redis, I turned off');
+      client.quit();
+      process.exit();
+    }, 10000);
+  });
 
-client.on('connect', () => {
-  logger.info('Connection with Redis is installed');
-});
+  const accessLogStream = fs.createWriteStream('access.log', { flags: 'a' });
+  app.use(morgan('combined', { stream: accessLogStream }));
+  app.use(morgan('dev'));
+  app.use(redisExpress(client));
+  controllers(app);
 
-client.on('error', () => {
-  logger.error('Connection error with redis');
-  const timerId = setInterval(() => {
-    client = redis.createClient();
-  }, 2000);
-
-  setTimeout(() => {
-    clearInterval(timerId);
-    logger.error('I could not connect to the redis, I turned off');
-    client.quit();
-    process.exit();
-  }, 10000);
-});
-
-const accessLogStream = fs.createWriteStream('access.log', { flags: 'a' });
-app.use(morgan('combined', { stream: accessLogStream }));
-app.use(morgan('dev'));
-app.use(redisExpress(client));
-controllers(app);
-
-module.exports = app;
+  return app;
+};
 

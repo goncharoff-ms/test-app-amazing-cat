@@ -2,7 +2,7 @@ const cluster = require('express-cluster');
 
 const logger = require('./app/logger');
 
-const app = require('./app/app');
+const app = require('./app/app')('dev');
 
 cluster(() => {
   const port = process.env.PORT || 3000;
