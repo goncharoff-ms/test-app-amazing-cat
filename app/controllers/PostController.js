@@ -5,9 +5,9 @@ const mongoose = require('mongoose');
 
 const router = express.Router();
 
-const verifyToken = require('../auth/verifyToken');
+const verifyToken = require('../middleware/verifyToken');
 
-const verifyPostOwner = require('../auth/verifyPostOwner');
+const verifyPostOwner = require('../middleware/verifyPostOwner');
 
 const User = require('../models/User');
 

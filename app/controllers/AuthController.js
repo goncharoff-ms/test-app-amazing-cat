@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 
 const router = express.Router();
 
-const verifyToken = require('../auth/verifyToken');
+const verifyToken = require('./../middleware/verifyToken');
 
 const jwt = require('jsonwebtoken');
 
@@ -18,6 +18,8 @@ const bcrypt = require('bcryptjs');
 const shortId = require('shortid');
 
 const logger = require('../logger');
+
+const redis = require('./../connectors/RedisConnector');
 
 router.post('/login', (req, res) => {
   User.findOne({ username: req.body.username }).exec()
@@ -51,7 +53,7 @@ router.post('/login', (req, res) => {
 });
 
 router.post('/logout', verifyToken, (req, res) => {
-  req.redis.set(req.token.jti, req.userId, 'EX', req.token.timeToDelete, (err) => {
+  redis.set(req.token.jti, req.userId, 'EX', req.token.timeToDelete, (err) => {
     if (err) {
       return res.status(500).send({
         code: 500,
@@ -71,36 +73,37 @@ router.post('/register', (req, res) => {
   user._id = new mongoose.Types.ObjectId();
   user.username = req.body.username;
   user.password = req.body.password;
-  user.validate()
-    .then(() => User.hashPassword(user.password))
-    .then((hashPassword) => {
-      user.password = hashPassword;
-      return user.save();
-    })
-    .then((userSave) => {
-      jwt.sign(
-        {
-          id: userSave._id,
-          jti: `${userSave._id}:${shortId.generate()}`,
-        },
-        config.secret, {
-          expiresIn: 86400,
-        }, (err, token) => res.status(200).send({
-          code: 200,
-          message: 'Success registration',
-          auth: true,
-          token,
-        }),
-      );
-    })
-    .catch(() => {
-      logger.error('Error in create new user');
-      return res.status(500).send({
-        code: 500,
-        auth: false,
-        message: 'There was a problem registering the user ',
+  user.validate(() => {
+    User.hashPassword(user.password)
+      .then((hashPassword) => {
+        user.password = hashPassword;
+        return user.save();
+      })
+      .then((userSave) => {
+        jwt.sign(
+          {
+            id: userSave._id,
+            jti: `${userSave._id}:${shortId.generate()}`,
+          },
+          config.secret, {
+            expiresIn: 86400,
+          }, (err, token) => res.status(200).send({
+            code: 200,
+            message: 'Success registration',
+            auth: true,
+            token,
+          }),
+        );
+      })
+      .catch(() => {
+        logger.error('Error in create new user');
+        return res.status(500).send({
+          code: 500,
+          auth: false,
+          message: 'There was a problem registering the user ',
+        });
       });
-    });
+  });
 });
 
 

@@ -1,5 +1,8 @@
-const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
-const config = require('../config'); // get our config file
+const jwt = require('jsonwebtoken');
+
+const config = require('../config');
+
+const redis = require('../connectors/RedisConnector');
 
 
 /* eslint consistent-return:0 */
@@ -22,7 +25,7 @@ function verifyToken(req, res, next) {
       return res.status(500).send({ code: 500, auth: false, message: 'Failed to authenticate token.' });
     }
 
-    req.redis.exists(decoded.jti, (error, reply) => {
+    redis.exists(decoded.jti, (error, reply) => {
       if (reply === 1) {
         return res.status(401).send({ code: 401, auth: false, message: 'Token is not valid.' });
       }

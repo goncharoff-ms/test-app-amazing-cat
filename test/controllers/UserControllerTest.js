@@ -1,10 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 
-const app = require('./../../app/app')('test');
-
-const port = process.env.PORT || 3005;
-
-const server = app.listen(port);
+const server = require('./../serverTest');
 
 const mongoose = require('mongoose');
 
@@ -58,6 +54,11 @@ describe('UserController', () => {
         done();
       });
     });
+  });
+
+  after(function (done) {
+    server.close();
+    done();
   });
 
   describe('/GET users/:username/posts', () => {

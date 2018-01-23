@@ -3,7 +3,9 @@ const express = require('express');
 
 const router = express.Router();
 
-const verifyToken = require('../auth/verifyToken');
+const redis = require('./../connectors/RedisConnector');
+
+const verifyToken = require('../middleware/verifyToken');
 
 const User = require('../models/User');
 
@@ -17,7 +19,7 @@ router.delete('/:username', verifyToken, (req, res) => {
   User.findByIdAndRemove(req.userId)
     .then(() => Post.remove({ author: req.userId }))
     .then(() => {
-      req.redis.set(req.token.jti, req.userId, 'EX', req.token.timeToDelete, (err, resp) => {
+      redis.set(req.token.jti, req.userId, 'EX', req.token.timeToDelete, (err, resp) => {
         if (err) {
           return res.status(500).send({
             code: 500,

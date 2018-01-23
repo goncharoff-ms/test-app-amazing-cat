@@ -1,11 +1,4 @@
 /* eslint-disable no-underscore-dangle */
-
-const app = require('./../../app/app')('test');
-
-const port = process.env.PORT || 3005;
-
-const server = app.listen(port);
-
 const mongoose = require('mongoose');
 
 const User = require('../../app/models/User');
@@ -19,6 +12,8 @@ const mocha = require('mocha');
 const assert = chai.assert;
 
 const should = chai.should();
+
+const server = require('./../serverTest');
 
 chai.use(chaiHttp);
 
@@ -36,6 +31,11 @@ describe('AuthController', () => {
     User.remove({}, () => {
       done();
     });
+  });
+
+  after(function (done) {
+    server.close();
+    done();
   });
 
 

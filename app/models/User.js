@@ -8,18 +8,12 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    validate: v => new Promise((resolve, reject) => {
+    validate: (v, cb) => {
       const usernameRegExp = /^[a-z0-9A-Z_]{5,15}$/;
       const msg = `${v} is not a valid username!`;
-
       const result = usernameRegExp.test(v);
-
-      if (result) {
-        resolve(result);
-      } else {
-        reject(msg);
-      }
-    }),
+      cb(result, msg);
+    },
   },
   password: {
     type: String,
