@@ -27,8 +27,8 @@ router.get('/:id', (req, res) => {
         post,
       });
     })
-    .catch((error) => {
-      logger.warn('Post in not available', req.params, error);
+    .catch(() => {
+      logger.warn('Post in not available', req.params);
       res.status(404).send({
         code: 404,
         message: 'This post is not available.',
