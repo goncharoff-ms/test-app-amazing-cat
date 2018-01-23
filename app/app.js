@@ -18,37 +18,50 @@ const redisExpress = require('./middleware/expressRedis');
 
 const bluebird = require('bluebird');
 
-let client = redis.createClient();
+const client = redis.createClient({
+  retry_strategy: (options) => {
+    if (options.error && options.error.code === 'ECONNREFUSED') {
+      return new Error('The server refused the connection');
+    }
+    if (options.total_retry_time > 1000 * 60 * 60) {
+      return new Error('Retry time exhausted');
+    }
+    if (options.attempt > 10) {
+      return undefined;
+    }
+    return Math.min(options.attempt * 100, 3000);
+  },
+});
 
 const logger = require('./logger');
 
-
 module.exports = (mode = 'dev') => {
-  function tryReconnectMongo() {
-    logger.error('There is no connection with Mongo, we are trying to connect');
-    const timerId = setInterval(() => {
-      mongoose.connect(config.dbUrl, { useMongoClient: true });
-    }, 2000);
-
-    setTimeout(() => {
-      clearInterval(timerId);
-      logger.error('I could not connect to the database, I turned off');
-      client.quit();
-      process.exit();
-    }, 10000);
-  }
-
+  let mongoUrl = config.dbUrl;
   if (mode === 'test') {
-    mongoose.connect(config.dbUtlTest, { useMongoClient: true });
-  } else {
-    mongoose.connect(config.dbUrl, { useMongoClient: true });
+    mongoUrl = config.dbUtlTest;
   }
+
+  const optionsMongoDB = {
+    autoReconnect: true,
+    useMongoClient: true,
+    keepAlive: 30000,
+    reconnectInterval: 3000,
+    reconnectTries: 10000,
+  };
+
+  mongoose.connect(mongoUrl, optionsMongoDB);
 
   mongoose.Promise = bluebird;
 
-  mongoose.connection.on('error', tryReconnectMongo);
+  mongoose.connection.on('error', (error) => {
+    logger.error('MongoDB error!');
+    throw new Error('Mongo error: ', error);
+  });
 
-  mongoose.connection.on('disconnected', tryReconnectMongo);
+  mongoose.connection.on('disconnected', () => {
+    logger.error('MongoDB disconnected!');
+    mongoose.connect(mongoUrl, optionsMongoDB);
+  });
 
   mongoose.connection.on('connected', () => {
     logger.info('Connection with Mongo is installed');
@@ -58,24 +71,23 @@ module.exports = (mode = 'dev') => {
     logger.info('Connection with Redis is installed');
   });
 
-  client.on('error', () => {
-    logger.error('Connection error with redis');
-    const timerId = setInterval(() => {
-      client = redis.createClient();
-    }, 2000);
+  client.on('reconnecting', () => {
+    logger.warn('Trying to reconnect to radis');
+  });
 
-    setTimeout(() => {
-      clearInterval(timerId);
-      logger.error('I could not connect to the redis, I turned off');
-      client.quit();
-      process.exit();
-    }, 10000);
+  client.on('error', (error) => {
+    logger.error('Redis error!');
+    throw new Error('Redis error: ', error);
   });
 
   const accessLogStream = fs.createWriteStream('access.log', { flags: 'a' });
+
   app.use(morgan('combined', { stream: accessLogStream }));
+
   app.use(morgan('dev'));
+
   app.use(redisExpress(client));
+
   controllers(app);
 
   return app;
