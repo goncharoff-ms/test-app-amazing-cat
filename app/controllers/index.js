@@ -8,7 +8,6 @@ const usersController = require('./UserController');
 
 const PostController = require('./PostController');
 
-
 /**
  * Connect all controllers
  * @param app this our Express application

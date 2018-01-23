@@ -1,4 +1,4 @@
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-underscore-dangle,prefer-destructuring,no-undef,no-unused-vars */
 
 const server = require('./../serverTest');
 
@@ -56,7 +56,7 @@ describe('UserController', () => {
     });
   });
 
-  after(function (done) {
+  after((done) => {
     server.close();
     done();
   });

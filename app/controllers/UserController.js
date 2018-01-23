@@ -13,7 +13,6 @@ const Post = require('../models/Post');
 
 const logger = require('../logger');
 
-
 router.delete('/:username', verifyToken, (req, res) => {
   logger.info(`delete user:  ${req.params.username}`);
   User.findByIdAndRemove(req.userId)

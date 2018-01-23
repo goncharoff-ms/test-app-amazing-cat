@@ -1,4 +1,4 @@
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-underscore-dangle,prefer-destructuring,no-undef,no-unused-vars */
 const mongoose = require('mongoose');
 
 const User = require('../../app/models/User');
@@ -33,7 +33,7 @@ describe('AuthController', () => {
     });
   });
 
-  after(function (done) {
+  after((done) => {
     server.close();
     done();
   });
