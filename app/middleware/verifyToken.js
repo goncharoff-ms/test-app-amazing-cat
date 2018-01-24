@@ -1,12 +1,11 @@
+/* eslint consistent-return:0 */
 const jwt = require('jsonwebtoken');
 
 const config = require('../config');
 
 const redis = require('../connectors/RedisConnector');
 
-
-/* eslint consistent-return:0 */
-/** //eslint-disable-line consistent-return
+/**
  * Checks the incoming token and determines its owner, sets the variable.
  * @param req
  * @param res

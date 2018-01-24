@@ -6,7 +6,9 @@ const logger = require('./../logger');
 
 const config = require('./../config');
 
+
 let mongoUrl = config.dbUrl;
+
 
 logger.info(`Environment is [${process.env.mode}]`);
 

@@ -11,10 +11,8 @@ const Post = require('../models/Post');
  */
 function verifyPostOwner(req, res, next) {
   Post.findById(req.params.id)
-    .populate('author')
-    .exec()
     .then((post) => {
-      if (String(post.author._id) === String(req.userId)) {
+      if (String(post.author) === String(req.userId)) {
         req.post = post;
         next();
       } else {
